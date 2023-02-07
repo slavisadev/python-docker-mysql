@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+  
+  mysql:
+    build: docker/mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - data-volume:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=django
+    healthcheck:
+      test: "exit 0"
+
+
+volumes:
+  data-volume:      
